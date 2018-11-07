@@ -16,7 +16,7 @@ from pyspark.sql import SparkSession
 spark = SparkSession.builder.appName('wrangler').getOrCreate()
 #r = spark.sparkContext.parallelize(range(10))
 storage_account_name = "svvpocdlgen2"
-storage_account_access_key = environt.get("STORAGE_KEY")
+storage_account_access_key = environ.get("STORAGE_KEY")
 
 file_location = "abfss://testshare/"
 spark.conf.set("fs.azure.account.key."+storage_account_name+".blob.core.windows.net", storage_account_access_key)
