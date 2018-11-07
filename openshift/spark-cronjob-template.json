@@ -79,9 +79,6 @@
 			  "schedule": "${CRON_SCHEDULE}",
 			  "jobTemplate": {
 				  "spec": {
-					  "selector": {
-						  "radanalytics.io/Job": "${APPLICATION_NAME}"
-					  },
 					  "completions": "${COMPLETIONS}",
 					  "parallelism": 1,
 					  "template": {
