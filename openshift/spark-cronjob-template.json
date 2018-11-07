@@ -2,14 +2,14 @@
    "kind": "Template",
    "apiVersion": "v1",
    "metadata": {
-      "name": "oshinko-spark-job",
+      "name": "oshinko-spark-cronjob",
       "annotations": {
-         "description": "Create a CronJob using an existing Spark image"
+         "description": "Creates a CronJob and corresponding Service using an existing Spark image"
       }
    },
    "labels": {
       "application": "oshinko-spark",
-      "createdBy": "template-oshinko-spark-job"
+      "createdBy": "template-oshinko-spark-cronjob"
    },
    "parameters": [
       {
@@ -64,7 +64,25 @@
 	  {
 		 "description": "CronJob schedule in cron format (https://en.wikipedia.org/wiki/Cron)",
 		 "name": "CRON_SCHEDULE",
-		 "value": "*/2 * * * *",
+		 "value": "*/10 * * * *",
+		 "required": true
+	  },
+	  {
+		 "description": "Concurrency Policy for job. 'Allow', 'Forbid' or 'Replace'. (https://kubernetes.io/docs/tasks/job/automated-tasks-with-cron-jobs/)",
+		 "name": "CONCURRENCY_POLICY",
+		 "value": "Forbid",
+		 "required": true
+	  },
+	  {
+		 "description": "Amount of successful jobs to store.",
+		 "name": "SUCCESS_HISTORY",
+		 "value": "3",
+		 "required": true
+	  },
+	  {
+		 "description": "Amount of failed jobs to store.",
+		 "name": "FAIL_HISTORY",
+		 "value": "1",
 		 "required": true
 	  }
    ],
@@ -77,6 +95,9 @@
           },
 		  "spec": {
 			  "schedule": "${CRON_SCHEDULE}",
+			  "concurrencyPolicy": "${CONCURRENCY_POLICY}",
+			  "successfulJobsHistoryLimit": "${SUCCESS_HISTORY}",
+			  "failedJobsHistoryLimit": "${FAIL_HISTORY}",
 			  "jobTemplate": {
 				  "spec": {
 					  "completions": "${COMPLETIONS}",
