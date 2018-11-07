@@ -1,3 +1,4 @@
 azure-mgmt-resource
 azure-mgmt-datalake-store
 azure-datalake-store
+mysql-connector

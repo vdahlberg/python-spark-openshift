@@ -1,10 +1,17 @@
-#import os
-#from os import environ
+import os
+from os import environ
 from pyspark.sql import SparkSession
-
+import mysql.connector
 #from azure.common.credentials import ServicePrincipalCredentials
 #from azure.datalake.store import core, lib, multithread
 
+db = mysql.connector.connect(host=environ.get("MYSQL_HOST"), user=environ.get("MYSQL_USER"), passwd=environ.get("MYSQL_PWD"))
+
+cursor = db.cursor()
+cursor.execute("SHOW DATABASES")
+
+for x in cursor:
+    print(x)
 
 spark = SparkSession.builder.appName('wrangler').getOrCreate()
 r = spark.sparkContext.parallelize(range(10))
