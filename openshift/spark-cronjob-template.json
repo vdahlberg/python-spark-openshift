@@ -62,7 +62,7 @@
          "required": true
       },
 	  {
-		 "description": "CronJob schedule in cron format (https://en.wikipedia.org/wiki/Cron)"
+		 "description": "CronJob schedule in cron format (https://en.wikipedia.org/wiki/Cron)",
 		 "name": "CRON_SCHEDULE",
 		 "value": "*/2 * * * *",
 		 "required": true
