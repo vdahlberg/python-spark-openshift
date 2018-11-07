@@ -17,7 +17,7 @@ storage_account_name = "svvpocdlgen2"
 storage_account_access_key = environ.get("STORAGE_KEY")
 
 
-spark = SparkSession.builder.appName('wrangler').config("fs.azure", "org.apache.hadoop.fs.azure.NativeAzureFileSystem").config("spark.hadoop.fs.wasb.imlp", "org.apache.hadoop.fs.azure.NativeAzureFileSystem").config("fs.azure.account.key."+storage_account_name+".blob.core.windows.net", storage_account_access_key).getOrCreate()
+spark = SparkSession.builder.appName('wrangler').config("spark.hadoop.fs.wasbs.impl", "org.apache.hadoop.fs.azure.NativeAzureFileSystem").config("fs.wasbs.impl", "org.apache.hadoop.fs.azure.NativeAzureFileSystem").config("fs.azure.account.key."+storage_account_name+".blob.core.windows.net", storage_account_access_key).getOrCreate()
 			
 
 
