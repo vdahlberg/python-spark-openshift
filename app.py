@@ -15,8 +15,6 @@ file_location = "abfss://testshare/"
 df = spark.read.format("csv").options(header='true',inferschema='true',sep=";").load("wasbs://testshare@svvpocdlgen2.blob.core.windows.net/1900116_20180306000000-20180331235900.csv")
 #df_mean = df.select(mean(col('vehicle_type_quality'))).collect()
 
-df.createOrReplaceTempView("vehicledata")
-
 jdbcHostname = "svvpocsql1.database.windows.net"
 jdbcDatabase = "svvpocdb1"
 jdbcPort = 1433
@@ -29,6 +27,8 @@ connectionProperties = {
   "password" : password,
   "driver" : "com.microsoft.sqlserver.jdbc.SQLServerDriver"
 }
+
+df.createOrReplaceTempView("vehicledata")
 
 import org.apache.spark.sql.SaveMode
 
