@@ -30,9 +30,8 @@ connectionProperties = {
 
 df.createOrReplaceTempView("vehicledata")
 
-import org.apache.spark.sql.SaveMode
 
-spark.table("vehicledata").write.mode(SaveMode.Overwrite).jdbc(jdbcUrl, "vehicledata", connectionProperties)
+spark.table("vehicledata").write.jdbc(jdbcUrl, "vehicledata", connectionProperties)
 
 
 vehicle_type_table = spark.read.jdbc(jdbcUrl, "vehicledata", connectionProperties)
