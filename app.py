@@ -28,10 +28,7 @@ connectionProperties = {
   "driver" : "com.microsoft.sqlserver.jdbc.SQLServerDriver"
 }
 
-df.createOrReplaceTempView("vehicledata")
-
-
-spark.table("vehicledata").write.jdbc(jdbcUrl, "vehicledata", connectionProperties)
+df.write.jdbc(url=jdbcUrl, table="vehicledata", mode="overwrite", properties=connectionProperties)
 
 
 vehicle_type_table = spark.read.jdbc(jdbcUrl, "vehicledata", connectionProperties)
