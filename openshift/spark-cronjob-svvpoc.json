@@ -45,6 +45,16 @@
          "name": "APP_MAIN_CLASS"
       },
       {
+         "description": "Docker registry, docker-registry.default.svc or 172.30.1.1:5000. (Needed beacuse imagestreams are not supported in non-openshift resources.)",
+         "name": "REGISTRY"
+		 "required": true
+      },
+      {
+         "description": "Namespace (Needed beacuse imagestreams are not supported in non-openshift resources.)",
+         "name": "NAMESPACE"
+		 "required": true
+      },
+      {
          "description": "List of additional spark options to pass to spark-submit (for exmaple --conf property=value --conf property=value). Note, --master and --class are set by the launcher and should not be set here",
          "name": "SPARK_OPTIONS",
 		 "value": "--packages org.apache.hadoop:hadoop-azure:2.7.0,com.microsoft.azure:azure-storage:2.0.0,com.microsoft.sqlserver:mssql-jdbc:7.0.0.jre8",
@@ -227,7 +237,7 @@
 						  "spec": {
 							  "containers": [
 								  {
-									  "image": "${APPLICATION_NAME}:latest",
+									  "image": "${REGISTRY}/${NAMESPACE}/${APPLICATION_NAME}:latest",
 									  "name": "${APPLICATION_NAME}-cronjob",
 									  "env": [
 										{
