@@ -19,7 +19,7 @@ jdbcHostname = environ.get("AZURE_SQL_HOST");
 jdbcDatabase = environ.get("AZURE_SQL_DB")
 jdbcPort = environ.get("AZURE_SQL_PORT")
 username = environ.get("AZURE_SQL_UNAME")
-password = environ.get("SQLDB_PWD") # environ.get("AZURE_SQL_PASSWD")
+password = environ.get("AZURE_SQL_PASSWD")
 
 jdbcUrl = "jdbc:sqlserver://{0}:{1};database={2}".format(jdbcHostname, jdbcPort, jdbcDatabase)
 connectionProperties = {
