@@ -189,6 +189,30 @@
 										   "value": "${OSHINKO_NAMED_CONFIG}"
 										},
 										{
+										   "name": "AZURE_STORAGE_ACCESS_KEY",
+										   "value": "${AZURE_STORAGE_ACCESS_KEY}"
+										},
+										{
+										   "name": "AZURE_SQL_HOST",
+										   "value": "${AZURE_SQL_HOST}"
+										},
+										{
+										   "name": "AZURE_SQL_PORT",
+										   "value": "${AZURE_SQL_PORT}"
+										},
+										{
+										   "name": "AZURE_SQL_DB",
+										   "value": "${AZURE_SQL_DB}"
+										},
+										{
+										   "name": "AZURE_SQL_UNAME",
+										   "value": "${AZURE_SQL_UNAME}"
+										},
+										{
+										   "name": "AZURE_SQL_PASSWD",
+										   "value": "${AZURE_SQL_PASSWD}"
+										},
+										{
 										   "name": "POD_NAME",
 										   "valueFrom":
 											 {
