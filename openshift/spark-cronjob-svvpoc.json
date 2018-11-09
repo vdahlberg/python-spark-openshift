@@ -46,12 +46,12 @@
       },
       {
          "description": "Docker registry, docker-registry.default.svc or 172.30.1.1:5000. (Needed beacuse imagestreams are not supported in non-openshift resources.)",
-         "name": "REGISTRY"
+         "name": "REGISTRY",
 		 "required": true
       },
       {
          "description": "Namespace (Needed beacuse imagestreams are not supported in non-openshift resources.)",
-         "name": "NAMESPACE"
+         "name": "NAMESPACE",
 		 "required": true
       },
       {
