@@ -2,27 +2,39 @@
    "kind": "Template",
    "apiVersion": "v1",
    "metadata": {
-      "name": "oshinko-spark-cronjob",
+      "name": "oshinko-bc-is-spark-cronjob",
       "annotations": {
-         "description": "Creates a CronJob and corresponding Service using an existing Spark image"
+         "description": "Creates a bc,is,cronjob and service."
       }
    },
    "labels": {
       "application": "oshinko-spark",
-      "createdBy": "template-oshinko-spark-cronjob"
+      "createdBy": "template-bc-is-spark-cronjob"
    },
    "parameters": [
-      {
-         "description": "The name to use for the job",
+	  {
+         "description": "The name to to use for the buildconfig,imagestream and job",
          "name": "APPLICATION_NAME",
          "generate": "expression",
-         "from": "spark-[a-z0-9]{4}",
+         "from": "python-spark-[a-z0-9]{4}",
          "required": true
       },
       {
-         "description": "The Docker pull specification of the image to run",
-         "name": "IMAGE",
-         "required": true
+         "description": "The name of the main py file to run. If this is not specified and there is a single py file at top level of the git respository, that file will be chosen.",
+         "name": "APP_FILE"
+      },
+      {
+         "description": "Git source URI for application",
+         "name": "GIT_URI"
+      },
+      {
+         "description": "Git branch/tag reference",
+         "name": "GIT_REF",
+         "value": "master"
+      },
+      {
+         "description": "Git sub-directory path",
+         "name": "CONTEXT_DIR"
       },
       {
          "description": "Command line arguments to pass to the application",
@@ -35,6 +47,8 @@
       {
          "description": "List of additional spark options to pass to spark-submit (for exmaple --conf property=value --conf property=value). Note, --master and --class are set by the launcher and should not be set here",
          "name": "SPARK_OPTIONS"
+		 "value": "--packages org.apache.hadoop:hadoop-azure:2.7.0,com.microsoft.azure:azure-storage:2.0.0,com.microsoft.sqlserver:mssql-jdbc:7.0.0.jre8"
+		 "required": true
       },
       {
         "description": "The desired number of successful completions",
@@ -84,14 +98,115 @@
 		 "name": "FAIL_HISTORY",
 		 "value": "1",
 		 "required": true
+	  },
+	  {
+		 "description": "Storage access key for Azure BLOB",
+		 "name": "AZURE_STORAGE_ACCESS_KEY",
+		 "required": true
+	  },
+	  {
+		 "description": "Azure SQL host",
+		 "name": "AZURE_SQL_HOST",
+		 "value": "svvpocsql1.database.windows.net",
+		 "required": true
+	  },
+	  {
+		 "description": "Azure SQL port",
+		 "name": "AZURE_SQL_PORT",
+		 "value": "1433",
+		 "required": true
+	  },
+	  {
+		 "description": "Azure SQL DB",
+		 "name": "AZURE_SQL_DB",
+		 "value": "svvpocdb1",
+		 "required": true
+	  },
+	  {
+		 "description": "Azure SQL Username",
+		 "name": "AZURE_SQL_UNAME",
+		 "value": "svvpocadmin@svvpocsql1",
+		 "required": true
+	  },
+	  {
+		 "description": "Azure SQL Password",
+		 "name": "AZURE_SQL_PASSWD",
+		 "required": true
 	  }
    ],
    "objects": [
+	  {
+         "kind": "ImageStream",
+         "apiVersion": "v1",
+         "metadata": {
+            "name": "${APPLICATION_NAME}"
+         },
+         "spec": {
+            "dockerImageRepository": "${APPLICATION_NAME}",
+            "lookupPolicy": {
+                "local": true
+            },
+            "tags": [
+               {
+                  "name": "latest"
+               }
+            ]
+         }
+      },{
+         "kind": "BuildConfig",
+         "apiVersion": "v1",
+         "metadata": {
+            "name": "${APPLICATION_NAME}"
+         },
+         "spec": {
+            "triggers": [
+               {
+                  "type": "ConfigChange"
+               },
+               {
+                  "type": "GitHub",
+                  "github": {
+                      "secret": "${APPLICATION_NAME}"
+                  }
+               }
+            ],
+            "source": {
+               "type": "Git",
+               "git": {
+                  "uri": "${GIT_URI}",
+                  "ref": "${GIT_REF}"
+               },
+               "contextDir": "${CONTEXT_DIR}"
+            },
+            "strategy": {
+               "type": "Source",
+               "sourceStrategy": {
+                  "from": {
+                     "kind": "DockerImage",
+                     "name": "radanalyticsio/radanalytics-pyspark-py36"
+                  },
+                  "forcePull": true,
+                  "env": [
+                     {
+                        "name": "APP_FILE",
+                        "value": "${APP_FILE}"
+                     }
+                  ]
+               }
+            },
+            "output": {
+               "to": {
+                  "kind": "ImageStreamTag",
+                  "name": "${APPLICATION_NAME}:latest"
+               }
+            }
+         }
+      },
       {
           "apiVersion": "batch/v1beta1",
           "kind": "CronJob",
           "metadata": {
-              "name": "${APPLICATION_NAME}"
+              "name": "${APPLICATION_NAME}-cronjob"
           },
 		  "spec": {
 			  "schedule": "${CRON_SCHEDULE}",
@@ -104,20 +219,20 @@
 					  "parallelism": 1,
 					  "template": {
 						  "metadata": {
-							  "name": "${APPLICATION_NAME}",
+							  "name": "${APPLICATION_NAME}-cronjob",
 							  "labels": {
-								 "radanalytics.io/Job": "${APPLICATION_NAME}"
+								 "radanalytics.io/Job": "${APPLICATION_NAME}-cronjob"
 							  }
 						  },
 						  "spec": {
 							  "containers": [
 								  {
-									  "image": "${IMAGE}",
-									  "name": "${APPLICATION_NAME}",
+									  "image": "${APPLICATION_NAME}:latest",
+									  "name": "${APPLICATION_NAME}-cronjob",
 									  "env": [
 										{
 										   "name": "APPLICATION_NAME",
-										   "value": "${APPLICATION_NAME}"
+										   "value": "${APPLICATION_NAME}-cronjob"
 										},
 										{
 										   "name": "DRIVER_HOST",
@@ -160,6 +275,30 @@
 													  "fieldPath": "metadata.name"
 												   }
 											 }
+										},
+										{
+											"name": "AZURE_STORAGE_ACCESS_KEY",
+											"value": "${AZURE_STORAGE_ACCESS_KEY}"
+										},
+										{
+											"name": "AZURE_SQL_HOST",
+											"value": "${AZURE_SQL_HOST}"
+										},
+										{
+											"name": "AZURE_SQL_DB",
+											"value": "${AZURE_SQL_DB}"
+										},
+										{
+											"name": "AZURE_SQL_PORT",
+											"value": "${AZURE_SQL_PORT}"
+										},
+										{
+											"name": "AZURE_SQL_UNAME",
+											"value": "${AZURE_SQL_UNAME}"
+										},
+										{
+											"name": "AZURE_SQL_PASSWD",
+											"value": "${AZURE_SQL_PASSWD}"
 										}
 									  ],
 									  "volumeMounts": [
